@@ -1,9 +1,12 @@
+import { DateQuery } from '@ghostfolio/api/app/core/interfaces/date-query.interface';
 import { DataProviderService } from '@ghostfolio/api/services/data-provider/data-provider.service';
 import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data.service';
 import { MarketDataService } from '@ghostfolio/api/services/market-data.service';
 import { DataSource, MarketData } from '@prisma/client';
 
 import { CurrentRateService } from './current-rate.service';
+import { ExchangeRateService } from '../exchange-rate/exchange-rate.service';
+import { Big } from 'big.js';
 
 jest.mock('@ghostfolio/api/services/market-data.service', () => {
   return {
@@ -65,6 +68,35 @@ jest.mock('@ghostfolio/api/services/exchange-rate-data.service', () => {
   };
 });
 
+jest.mock('../exchange-rate/exchange-rate.service', () => {
+  return {
+    ExchangeRateService: jest.fn().mockImplementation(() => {
+      return {
+        getExchangeRates: ({
+          dateQuery,
+          sourceCurrencies,
+          destinationCurrency
+        }: {
+          dateQuery: DateQuery;
+          sourceCurrencies: Currency[];
+          destinationCurrency: Currency;
+        }) => {
+          return [
+            {
+              date: new Date(),
+              exchangeRates: {
+                USD: new Big(1),
+                CHF: new Big(1),
+                EUR: new Big(1)
+              }
+            }
+          ];
+        }
+      };
+    })
+  };
+});
+
 describe('CurrentRateService', () => {
   let currentRateService: CurrentRateService;
   let dataProviderService: DataProviderService;
@@ -78,10 +110,12 @@ describe('CurrentRateService', () => {
 
     await exchangeRateDataService.initialize();
 
+    const exchangeRateService = new ExchangeRateService(null);
     currentRateService = new CurrentRateService(
       dataProviderService,
       exchangeRateDataService,
-      marketDataService
+      marketDataService,
+      exchangeRateService
     );
   });
 
