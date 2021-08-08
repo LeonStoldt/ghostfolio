@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Currency } from '@prisma/client';
-import { DateQuery } from '@ghostfolio/api/app/core/interfaces/date-query.interface';
-import { MarketDataService } from '@ghostfolio/api/app/core/market-data.service';
 import Big from 'big.js';
 import { DateBasedExchangeRate } from './date-based-exchange-rate.interface';
+import { MarketDataService } from '@ghostfolio/api/app/portfolio/market-data.service';
+import { DateQuery } from '../portfolio/interfaces/date-query.interface';
 
 @Injectable()
 export class ExchangeRateService {
@@ -60,8 +59,8 @@ export class ExchangeRateService {
 
   private getUserExchangeRates(
     currentRates: { [symbol: string]: Big },
-    destinationCurrency: Currency,
-    sourceCurrencies: Currency[]
+    destinationCurrency: string,
+    sourceCurrencies: string[]
   ): { [currency: string]: Big } {
     const result: { [currency: string]: Big } = {};
 
@@ -69,20 +68,20 @@ export class ExchangeRateService {
       let exchangeRate: Big;
       if (sourceCurrency === destinationCurrency) {
         exchangeRate = new Big(1);
-      } else if (sourceCurrency === Currency.USD) {
+      } else if (sourceCurrency === 'USD') {
         exchangeRate = currentRates[`${sourceCurrency}${destinationCurrency}`];
-      } else if (destinationCurrency === Currency.USD) {
+      } else if (destinationCurrency === 'USD') {
         exchangeRate = new Big(1).div(
           currentRates[`${destinationCurrency}${sourceCurrency}`]
         );
       } else {
         if (
-          currentRates[`${Currency.USD}${destinationCurrency}`] &&
-          currentRates[`${Currency.USD}${sourceCurrency}`]
+          currentRates[`USD${destinationCurrency}`] &&
+          currentRates[`USD${sourceCurrency}`]
         ) {
-          exchangeRate = currentRates[
-            `${Currency.USD}${destinationCurrency}`
-          ].div(currentRates[`${Currency.USD}${sourceCurrency}`]);
+          exchangeRate = currentRates[`USD${destinationCurrency}`].div(
+            currentRates[`USD${sourceCurrency}`]
+          );
         }
       }
       if (exchangeRate) {

@@ -3,6 +3,7 @@ import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-
 import { MarketDataService } from '@ghostfolio/api/services/market-data.service';
 import { resetHours } from '@ghostfolio/common/helper';
 import { Injectable } from '@nestjs/common';
+import { Big } from 'big.js';
 import { isAfter, isBefore, isToday } from 'date-fns';
 import { flatten } from 'lodash';
 
@@ -124,20 +125,26 @@ export class CurrentRateService {
           const result = [];
           let j = 0;
           for (const marketDataItem of data) {
+            const currency = currencies[marketDataItem.symbol];
             while (
               j + 1 < exchangeRates.length &&
               !isAfter(exchangeRates[j + 1].date, marketDataItem.date)
             ) {
               j++;
             }
-            const currency = currencies[marketDataItem.symbol];
-            let exchangeRate = exchangeRates[j].exchangeRates[currency];
-            for (
-              let k = j;
-              k >= 0 && !exchangeRates[k].exchangeRates[currency];
-              k--
-            ) {
-              exchangeRate = exchangeRates[k].exchangeRates[currency];
+            let exchangeRate: Big;
+            if (currency !== userCurrency) {
+              exchangeRate = exchangeRates[j]?.exchangeRates[currency];
+
+              for (
+                let k = j;
+                k >= 0 && !exchangeRates[k]?.exchangeRates[currency];
+                k--
+              ) {
+                exchangeRate = exchangeRates[k]?.exchangeRates[currency];
+              }
+            } else {
+              exchangeRate = new Big(1);
             }
             if (exchangeRate) {
               result.push({
