@@ -14,11 +14,11 @@ export class ExchangeRateService {
     destinationCurrency
   }: {
     dateQuery: DateQuery;
-    sourceCurrencies: Currency[];
-    destinationCurrency: Currency;
+    sourceCurrencies: string[];
+    destinationCurrency: string;
   }): Promise<DateBasedExchangeRate[]> {
     const symbols = [...sourceCurrencies, destinationCurrency].map(
-      (currency) => `${Currency.USD}${currency}`
+      (currency) => `USD${currency}`
     );
     const exchangeRates = await this.marketDataService.getRange({
       dateQuery,
@@ -74,16 +74,15 @@ export class ExchangeRateService {
         exchangeRate = new Big(1).div(
           currentRates[`${destinationCurrency}${sourceCurrency}`]
         );
-      } else {
-        if (
-          currentRates[`USD${destinationCurrency}`] &&
+      } else if (
+        currentRates[`USD${destinationCurrency}`] &&
+        currentRates[`USD${sourceCurrency}`]
+      ) {
+        exchangeRate = currentRates[`USD${destinationCurrency}`].div(
           currentRates[`USD${sourceCurrency}`]
-        ) {
-          exchangeRate = currentRates[`USD${destinationCurrency}`].div(
-            currentRates[`USD${sourceCurrency}`]
-          );
-        }
+        );
       }
+
       if (exchangeRate) {
         result[sourceCurrency] = exchangeRate;
       }

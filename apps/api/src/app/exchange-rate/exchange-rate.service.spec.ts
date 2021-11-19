@@ -1,12 +1,12 @@
 import { ExchangeRateService } from './exchange-rate.service';
-import { Currency, MarketData } from '@prisma/client';
+import { MarketData } from '@prisma/client';
 
-import { MarketDataService } from '../core/market-data.service';
 import { addDays, endOfDay, isBefore } from 'date-fns';
 import { Big } from 'big.js';
-import { DateQuery } from '@ghostfolio/api/app/core/interfaces/date-query.interface';
+import { DateQuery } from '@ghostfolio/api/app/portfolio/interfaces/date-query.interface';
+import { MarketDataService } from '../portfolio/market-data.service';
 
-jest.mock('../core/market-data.service', () => {
+jest.mock('../portfolio/market-data.service', () => {
   return {
     MarketDataService: jest.fn().mockImplementation(() => {
       return {
@@ -64,8 +64,8 @@ describe('ExchangeRateService', () => {
           gte: startDate,
           lt: endOfDay(startDate)
         },
-        sourceCurrencies: [Currency.USD],
-        destinationCurrency: Currency.USD
+        sourceCurrencies: ['USD'],
+        destinationCurrency: 'USD'
       });
 
       expect(exchangeRates).toEqual([
@@ -85,8 +85,8 @@ describe('ExchangeRateService', () => {
           gte: startDate,
           lt: endOfDay(startDate)
         },
-        sourceCurrencies: [Currency.USD],
-        destinationCurrency: Currency.CHF
+        sourceCurrencies: ['USD'],
+        destinationCurrency: 'CHF'
       });
 
       expect(exchangeRates).toEqual([
@@ -106,8 +106,8 @@ describe('ExchangeRateService', () => {
           gte: startDate,
           lt: endOfDay(startDate)
         },
-        sourceCurrencies: [Currency.CHF],
-        destinationCurrency: Currency.USD
+        sourceCurrencies: ['CHF'],
+        destinationCurrency: 'USD'
       });
 
       expect(exchangeRates).toEqual([
@@ -127,8 +127,8 @@ describe('ExchangeRateService', () => {
           gte: startDate,
           lt: endOfDay(startDate)
         },
-        sourceCurrencies: [Currency.CHF],
-        destinationCurrency: Currency.EUR
+        sourceCurrencies: ['CHF'],
+        destinationCurrency: 'EUR'
       });
 
       expect(exchangeRates).toEqual([
@@ -148,8 +148,8 @@ describe('ExchangeRateService', () => {
           gte: startDate,
           lt: endOfDay(startDate)
         },
-        sourceCurrencies: [Currency.CHF, Currency.USD, Currency.EUR],
-        destinationCurrency: Currency.EUR
+        sourceCurrencies: ['CHF', 'USD', 'EUR'],
+        destinationCurrency: 'EUR'
       });
 
       expect(exchangeRates).toEqual([
@@ -171,8 +171,8 @@ describe('ExchangeRateService', () => {
           gte: startDate,
           lt: endOfDay(addDays(startDate, 1))
         },
-        sourceCurrencies: [Currency.CHF, Currency.USD, Currency.EUR],
-        destinationCurrency: Currency.EUR
+        sourceCurrencies: ['CHF', 'USD', 'EUR'],
+        destinationCurrency: 'EUR'
       });
 
       expect(exchangeRates).toEqual([

@@ -78,8 +78,8 @@ jest.mock('../exchange-rate/exchange-rate.service', () => {
           destinationCurrency
         }: {
           dateQuery: DateQuery;
-          sourceCurrencies: Currency[];
-          destinationCurrency: Currency;
+          sourceCurrencies: string[];
+          destinationCurrency: string;
         }) => {
           return [
             {
@@ -114,8 +114,8 @@ describe('CurrentRateService', () => {
     currentRateService = new CurrentRateService(
       dataProviderService,
       exchangeRateDataService,
-      marketDataService,
-      exchangeRateService
+      exchangeRateService,
+      marketDataService
     );
   });
 

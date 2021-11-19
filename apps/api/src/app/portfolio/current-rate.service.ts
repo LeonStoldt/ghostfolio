@@ -17,8 +17,8 @@ export class CurrentRateService {
   public constructor(
     private readonly dataProviderService: DataProviderService,
     private readonly exchangeRateDataService: ExchangeRateDataService,
-    private readonly marketDataService: MarketDataService,
-    private readonly exchangeRateService: ExchangeRateService
+    private readonly exchangeRateService: ExchangeRateService,
+    private readonly marketDataService: MarketDataService
   ) {}
 
   public async getValue({
