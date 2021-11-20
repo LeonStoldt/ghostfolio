@@ -3,6 +3,7 @@ import Big from 'big.js';
 import { DateBasedExchangeRate } from './date-based-exchange-rate.interface';
 import { MarketDataService } from '@ghostfolio/api/app/portfolio/market-data.service';
 import { DateQuery } from '../portfolio/interfaces/date-query.interface';
+import { isSameDay } from 'date-fns';
 
 @Injectable()
 export class ExchangeRateService {
@@ -17,9 +18,9 @@ export class ExchangeRateService {
     sourceCurrencies: string[];
     destinationCurrency: string;
   }): Promise<DateBasedExchangeRate[]> {
-    const symbols = [...sourceCurrencies, destinationCurrency].map(
-      (currency) => `USD${currency}`
-    );
+    const symbols = [...sourceCurrencies, destinationCurrency]
+      .map((currency) => `${currency}USD`)
+      .filter((v, i, a) => a.indexOf(v) === i);
     const exchangeRates = await this.marketDataService.getRange({
       dateQuery,
       symbols
@@ -32,7 +33,7 @@ export class ExchangeRateService {
     let currentDate = exchangeRates[0].date;
     let currentRates: { [symbol: string]: Big } = {};
     for (const exchangeRate of exchangeRates) {
-      if (currentDate !== exchangeRate.date) {
+      if (!isSameDay(currentDate, exchangeRate.date)) {
         results.push({
           date: currentDate,
           exchangeRates: this.getUserExchangeRates(
@@ -68,18 +69,24 @@ export class ExchangeRateService {
       let exchangeRate: Big;
       if (sourceCurrency === destinationCurrency) {
         exchangeRate = new Big(1);
-      } else if (sourceCurrency === 'USD') {
-        exchangeRate = currentRates[`${sourceCurrency}${destinationCurrency}`];
-      } else if (destinationCurrency === 'USD') {
+      } else if (
+        sourceCurrency === 'USD' &&
+        currentRates[`${destinationCurrency}${sourceCurrency}`]
+      ) {
         exchangeRate = new Big(1).div(
           currentRates[`${destinationCurrency}${sourceCurrency}`]
         );
       } else if (
-        currentRates[`USD${destinationCurrency}`] &&
-        currentRates[`USD${sourceCurrency}`]
+        destinationCurrency === 'USD' &&
+        currentRates[`${sourceCurrency}${destinationCurrency}`]
       ) {
-        exchangeRate = currentRates[`USD${destinationCurrency}`].div(
-          currentRates[`USD${sourceCurrency}`]
+        exchangeRate = currentRates[`${sourceCurrency}${destinationCurrency}`];
+      } else if (
+        currentRates[`${destinationCurrency}USD`] &&
+        currentRates[`${sourceCurrency}USD`]
+      ) {
+        exchangeRate = currentRates[`${sourceCurrency}USD`].div(
+          currentRates[`${destinationCurrency}USD`]
         );
       }
 

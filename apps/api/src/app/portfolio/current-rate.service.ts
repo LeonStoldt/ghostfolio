@@ -1,10 +1,10 @@
 import { DataProviderService } from '@ghostfolio/api/services/data-provider/data-provider.service';
 import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data.service';
 import { MarketDataService } from '@ghostfolio/api/services/market-data.service';
-import { resetHours } from '@ghostfolio/common/helper';
-import { Injectable } from '@nestjs/common';
+import { DATE_FORMAT, resetHours } from '@ghostfolio/common/helper';
+import { Injectable, Logger } from '@nestjs/common';
 import { Big } from 'big.js';
-import { isAfter, isBefore, isToday } from 'date-fns';
+import { format, isAfter, isBefore, isToday } from 'date-fns';
 import { flatten } from 'lodash';
 
 import { ExchangeRateService } from '../exchange-rate/exchange-rate.service';
@@ -146,15 +146,33 @@ export class CurrentRateService {
             } else {
               exchangeRate = new Big(1);
             }
+            let marketPrice: number;
             if (exchangeRate) {
-              result.push({
-                date: marketDataItem.date,
-                marketPrice: exchangeRate
-                  .mul(marketDataItem.marketPrice)
-                  .toNumber(),
-                symbol: marketDataItem.symbol
-              });
+              marketPrice = exchangeRate
+                .mul(marketDataItem.marketPrice)
+                .toNumber();
+            } else {
+              if (!isToday(marketDataItem.date)) {
+                Logger.error(
+                  `Failed to get exchange rate from  ${
+                    currencies[marketDataItem.symbol]
+                  } to ${userCurrency} for day ${format(
+                    marketDataItem.date,
+                    DATE_FORMAT
+                  )}, using today's exchange rate instead`
+                );
+              }
+              marketPrice = this.exchangeRateDataService.toCurrency(
+                marketDataItem.marketPrice,
+                currencies[marketDataItem.symbol],
+                userCurrency
+              );
             }
+            result.push({
+              date: marketDataItem.date,
+              marketPrice: marketPrice,
+              symbol: marketDataItem.symbol
+            });
           }
           return result;
         })

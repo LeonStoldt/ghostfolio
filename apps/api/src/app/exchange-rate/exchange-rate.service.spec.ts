@@ -18,8 +18,8 @@ jest.mock('../portfolio/market-data.service', () => {
           symbols: string[];
         }) => {
           const exchangeRateMap = {
-            USDEUR: 1,
-            USDCHF: 2,
+            EURUSD: 1,
+            CHFUSD: 2,
             USDUSD: 0
           };
           const result = [];
@@ -93,7 +93,7 @@ describe('ExchangeRateService', () => {
         {
           date: startDate,
           exchangeRates: {
-            USD: new Big(3)
+            USD: new Big(1).div(3)
           }
         }
       ]);
@@ -114,7 +114,7 @@ describe('ExchangeRateService', () => {
         {
           date: startDate,
           exchangeRates: {
-            CHF: new Big(1).div(3)
+            CHF: new Big(3)
           }
         }
       ]);
@@ -135,7 +135,7 @@ describe('ExchangeRateService', () => {
         {
           date: startDate,
           exchangeRates: {
-            CHF: new Big(2).div(3)
+            CHF: new Big(3).div(2)
           }
         }
       ]);
@@ -156,8 +156,8 @@ describe('ExchangeRateService', () => {
         {
           date: startDate,
           exchangeRates: {
-            CHF: new Big(2).div(3),
-            USD: new Big(2),
+            CHF: new Big(3).div(2),
+            USD: new Big(1).div(2),
             EUR: new Big(1)
           }
         }
@@ -179,16 +179,16 @@ describe('ExchangeRateService', () => {
         {
           date: startDate,
           exchangeRates: {
-            CHF: new Big(2).div(3),
-            USD: new Big(2),
+            CHF: new Big(3).div(2),
+            USD: new Big(1).div(2),
             EUR: new Big(1)
           }
         },
         {
           date: addDays(startDate, 1),
           exchangeRates: {
-            CHF: new Big(3).div(5),
-            USD: new Big(3),
+            CHF: new Big(5).div(3),
+            USD: new Big(1).div(3),
             EUR: new Big(1)
           }
         }
