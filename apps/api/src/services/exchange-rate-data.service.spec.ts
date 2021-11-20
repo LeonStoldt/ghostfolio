@@ -1,12 +1,12 @@
-import { ExchangeRateService } from './exchange-rate.service';
 import { MarketData } from '@prisma/client';
 
 import { addDays, endOfDay, isBefore } from 'date-fns';
 import { Big } from 'big.js';
 import { DateQuery } from '@ghostfolio/api/app/portfolio/interfaces/date-query.interface';
-import { MarketDataService } from '../portfolio/market-data.service';
+import { MarketDataService } from '../app/portfolio/market-data.service';
+import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data.service';
 
-jest.mock('../portfolio/market-data.service', () => {
+jest.mock('../app/portfolio/market-data.service', () => {
   return {
     MarketDataService: jest.fn().mockImplementation(() => {
       return {
@@ -47,19 +47,23 @@ jest.mock('../portfolio/market-data.service', () => {
   };
 });
 
-describe('ExchangeRateService', () => {
-  let exchangeRateService: ExchangeRateService;
+describe('ExchangeRateDataService', () => {
+  let exchangeRateDataService: ExchangeRateDataService;
   let marketDataService: MarketDataService;
 
   beforeAll(async () => {
     marketDataService = new MarketDataService(null);
-    exchangeRateService = new ExchangeRateService(marketDataService);
+    exchangeRateDataService = new ExchangeRateDataService(
+      null,
+      marketDataService,
+      null
+    );
   });
 
   describe('getExchangeRates', () => {
     it('source and destination USD', async () => {
       const startDate = new Date(2021, 0, 1);
-      const exchangeRates = await exchangeRateService.getExchangeRates({
+      const exchangeRates = await exchangeRateDataService.getExchangeRates({
         dateQuery: {
           gte: startDate,
           lt: endOfDay(startDate)
@@ -80,7 +84,7 @@ describe('ExchangeRateService', () => {
 
     it('source USD and destination CHF', async () => {
       const startDate = new Date(2021, 0, 1);
-      const exchangeRates = await exchangeRateService.getExchangeRates({
+      const exchangeRates = await exchangeRateDataService.getExchangeRates({
         dateQuery: {
           gte: startDate,
           lt: endOfDay(startDate)
@@ -101,7 +105,7 @@ describe('ExchangeRateService', () => {
 
     it('source CHF and destination USD', async () => {
       const startDate = new Date(2021, 0, 1);
-      const exchangeRates = await exchangeRateService.getExchangeRates({
+      const exchangeRates = await exchangeRateDataService.getExchangeRates({
         dateQuery: {
           gte: startDate,
           lt: endOfDay(startDate)
@@ -122,7 +126,7 @@ describe('ExchangeRateService', () => {
 
     it('source CHF and destination EUR', async () => {
       const startDate = new Date(2021, 0, 1);
-      const exchangeRates = await exchangeRateService.getExchangeRates({
+      const exchangeRates = await exchangeRateDataService.getExchangeRates({
         dateQuery: {
           gte: startDate,
           lt: endOfDay(startDate)
@@ -143,7 +147,7 @@ describe('ExchangeRateService', () => {
 
     it('source CHF,EUR,USD and destination EUR', async () => {
       const startDate = new Date(2021, 0, 1);
-      const exchangeRates = await exchangeRateService.getExchangeRates({
+      const exchangeRates = await exchangeRateDataService.getExchangeRates({
         dateQuery: {
           gte: startDate,
           lt: endOfDay(startDate)
@@ -166,7 +170,7 @@ describe('ExchangeRateService', () => {
 
     it('with multiple days', async () => {
       const startDate = new Date(2021, 0, 1);
-      const exchangeRates = await exchangeRateService.getExchangeRates({
+      const exchangeRates = await exchangeRateDataService.getExchangeRates({
         dateQuery: {
           gte: startDate,
           lt: endOfDay(addDays(startDate, 1))

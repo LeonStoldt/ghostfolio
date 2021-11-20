@@ -5,7 +5,6 @@ import { MarketDataService } from '@ghostfolio/api/services/market-data.service'
 import { DataSource, MarketData } from '@prisma/client';
 
 import { CurrentRateService } from './current-rate.service';
-import { ExchangeRateService } from '../exchange-rate/exchange-rate.service';
 import { Big } from 'big.js';
 
 jest.mock('@ghostfolio/api/services/market-data.service', () => {
@@ -60,18 +59,6 @@ jest.mock('@ghostfolio/api/services/exchange-rate-data.service', () => {
     ExchangeRateDataService: jest.fn().mockImplementation(() => {
       return {
         initialize: () => Promise.resolve(),
-        toCurrency: (value: number) => {
-          return 1 * value;
-        }
-      };
-    })
-  };
-});
-
-jest.mock('../exchange-rate/exchange-rate.service', () => {
-  return {
-    ExchangeRateService: jest.fn().mockImplementation(() => {
-      return {
         getExchangeRates: ({
           dateQuery,
           sourceCurrencies,
@@ -91,6 +78,9 @@ jest.mock('../exchange-rate/exchange-rate.service', () => {
               }
             }
           ];
+        },
+        toCurrency: (value: number) => {
+          return 1 * value;
         }
       };
     })
@@ -105,16 +95,14 @@ describe('CurrentRateService', () => {
 
   beforeAll(async () => {
     dataProviderService = new DataProviderService(null, [], null);
-    exchangeRateDataService = new ExchangeRateDataService(null, null);
+    exchangeRateDataService = new ExchangeRateDataService(null, null, null);
     marketDataService = new MarketDataService(null);
 
     await exchangeRateDataService.initialize();
 
-    const exchangeRateService = new ExchangeRateService(null);
     currentRateService = new CurrentRateService(
       dataProviderService,
       exchangeRateDataService,
-      exchangeRateService,
       marketDataService
     );
   });

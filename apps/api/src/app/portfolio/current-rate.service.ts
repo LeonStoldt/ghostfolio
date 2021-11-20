@@ -7,7 +7,6 @@ import { Big } from 'big.js';
 import { format, isAfter, isBefore, isToday } from 'date-fns';
 import { flatten } from 'lodash';
 
-import { ExchangeRateService } from '../exchange-rate/exchange-rate.service';
 import { GetValueObject } from './interfaces/get-value-object.interface';
 import { GetValueParams } from './interfaces/get-value-params.interface';
 import { GetValuesParams } from './interfaces/get-values-params.interface';
@@ -17,7 +16,6 @@ export class CurrentRateService {
   public constructor(
     private readonly dataProviderService: DataProviderService,
     private readonly exchangeRateDataService: ExchangeRateDataService,
-    private readonly exchangeRateService: ExchangeRateService,
     private readonly marketDataService: MarketDataService
   ) {}
 
@@ -81,7 +79,7 @@ export class CurrentRateService {
     >[] = [];
 
     const sourceCurrencies = Object.values(currencies);
-    const exchangeRates = await this.exchangeRateService.getExchangeRates({
+    const exchangeRates = await this.exchangeRateDataService.getExchangeRates({
       dateQuery,
       sourceCurrencies,
       destinationCurrency: userCurrency

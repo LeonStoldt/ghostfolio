@@ -62,7 +62,6 @@ import {
   subYears
 } from 'date-fns';
 import { isEmpty } from 'lodash';
-import { ExchangeRateService } from '../exchange-rate/exchange-rate.service';
 
 import {
   HistoricalDataContainer,
@@ -78,7 +77,6 @@ export class PortfolioService {
     private readonly currentRateService: CurrentRateService,
     private readonly dataProviderService: DataProviderService,
     private readonly exchangeRateDataService: ExchangeRateDataService,
-    private readonly exchangeRateService: ExchangeRateService,
     private readonly impersonationService: ImpersonationService,
     private readonly orderService: OrderService,
     @Inject(REQUEST) private readonly request: RequestWithUser,
@@ -1081,7 +1079,7 @@ export class PortfolioService {
     const userCurrency = this.request.user?.Settings?.currency ?? baseCurrency;
 
     const dates = orders.map((order) => resetHours(order.date));
-    const exchangeRates = await this.exchangeRateService.getExchangeRates({
+    const exchangeRates = await this.exchangeRateDataService.getExchangeRates({
       dateQuery: {
         in: dates
       },
