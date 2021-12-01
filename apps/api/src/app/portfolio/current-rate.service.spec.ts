@@ -3,9 +3,9 @@ import { DataProviderService } from '@ghostfolio/api/services/data-provider/data
 import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data.service';
 import { MarketDataService } from '@ghostfolio/api/services/market-data.service';
 import { DataSource, MarketData } from '@prisma/client';
+import { Big } from 'big.js';
 
 import { CurrentRateService } from './current-rate.service';
-import { Big } from 'big.js';
 
 jest.mock('@ghostfolio/api/services/market-data.service', () => {
   return {

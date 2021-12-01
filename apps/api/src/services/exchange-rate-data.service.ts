@@ -1,16 +1,16 @@
+import { DateQuery } from '@ghostfolio/api/app/portfolio/interfaces/date-query.interface';
+import { MarketDataService } from '@ghostfolio/api/app/portfolio/market-data.service';
+import { DateBasedExchangeRate } from '@ghostfolio/api/services/interfaces/date-based-exchange-rate.interface';
 import { baseCurrency } from '@ghostfolio/common/config';
 import { DATE_FORMAT, getYesterday } from '@ghostfolio/common/helper';
 import { Injectable, Logger } from '@nestjs/common';
+import Big from 'big.js';
 import { format, isSameDay } from 'date-fns';
 import { isEmpty, isNumber, uniq } from 'lodash';
 
 import { DataProviderService } from './data-provider/data-provider.service';
 import { IDataGatheringItem } from './interfaces/interfaces';
 import { PrismaService } from './prisma.service';
-import { MarketDataService } from '@ghostfolio/api/app/portfolio/market-data.service';
-import { DateQuery } from '@ghostfolio/api/app/portfolio/interfaces/date-query.interface';
-import { DateBasedExchangeRate } from '@ghostfolio/api/services/interfaces/date-based-exchange-rate.interface';
-import Big from 'big.js';
 
 @Injectable()
 export class ExchangeRateDataService {
