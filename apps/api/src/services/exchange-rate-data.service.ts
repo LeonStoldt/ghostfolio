@@ -44,7 +44,7 @@ export class ExchangeRateDataService {
     destinationCurrency: string;
   }): Promise<DateBasedExchangeRate[]> {
     const symbols = [...sourceCurrencies, destinationCurrency]
-      .map((currency) => `${currency}USD`)
+      .map((currency) => `${currency}${baseCurrency}`)
       .filter((v, i, a) => a.indexOf(v) === i);
     const exchangeRates = await this.marketDataService.getRange({
       dateQuery,
@@ -149,10 +149,10 @@ export class ExchangeRateDataService {
       this.exchangeRates[symbol] = resultExtended[symbol]?.[date]?.marketPrice;
 
       if (!this.exchangeRates[symbol]) {
-        // Not found, calculate indirectly via USD
+        // Not found, calculate indirectly via base currency
         this.exchangeRates[symbol] =
-          resultExtended[`${currency1}${'USD'}`]?.[date]?.marketPrice *
-          resultExtended[`${'USD'}${currency2}`]?.[date]?.marketPrice;
+          resultExtended[`${currency1}${baseCurrency}`]?.[date]?.marketPrice *
+          resultExtended[`${baseCurrency}${currency2}`]?.[date]?.marketPrice;
 
         // Calculate the opposite direction
         this.exchangeRates[`${currency2}${currency1}`] =
@@ -181,9 +181,9 @@ export class ExchangeRateDataService {
       if (this.exchangeRates[`${aFromCurrency}${aToCurrency}`]) {
         factor = this.exchangeRates[`${aFromCurrency}${aToCurrency}`];
       } else {
-        // Calculate indirectly via USD
-        const factor1 = this.exchangeRates[`${aFromCurrency}${'USD'}`];
-        const factor2 = this.exchangeRates[`${'USD'}${aToCurrency}`];
+        // Calculate indirectly via base currency
+        const factor1 = this.exchangeRates[`${aFromCurrency}${baseCurrency}`];
+        const factor2 = this.exchangeRates[`${baseCurrency}${aToCurrency}`];
 
         factor = factor1 * factor2;
 
@@ -250,23 +250,23 @@ export class ExchangeRateDataService {
       if (sourceCurrency === destinationCurrency) {
         exchangeRate = new Big(1);
       } else if (
-        sourceCurrency === 'USD' &&
+        sourceCurrency === baseCurrency &&
         currentRates[`${destinationCurrency}${sourceCurrency}`]
       ) {
         exchangeRate = new Big(1).div(
           currentRates[`${destinationCurrency}${sourceCurrency}`]
         );
       } else if (
-        destinationCurrency === 'USD' &&
+        destinationCurrency === baseCurrency &&
         currentRates[`${sourceCurrency}${destinationCurrency}`]
       ) {
         exchangeRate = currentRates[`${sourceCurrency}${destinationCurrency}`];
       } else if (
-        currentRates[`${destinationCurrency}USD`] &&
-        currentRates[`${sourceCurrency}USD`]
+        currentRates[`${destinationCurrency}${baseCurrency}`] &&
+        currentRates[`${sourceCurrency}${baseCurrency}`]
       ) {
-        exchangeRate = currentRates[`${sourceCurrency}USD`].div(
-          currentRates[`${destinationCurrency}USD`]
+        exchangeRate = currentRates[`${sourceCurrency}${baseCurrency}`].div(
+          currentRates[`${destinationCurrency}${baseCurrency}`]
         );
       }
 
