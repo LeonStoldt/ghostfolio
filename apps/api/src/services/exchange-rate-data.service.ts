@@ -1,6 +1,6 @@
 import { DateQuery } from '@ghostfolio/api/app/portfolio/interfaces/date-query.interface';
-import { MarketDataService } from '@ghostfolio/api/app/portfolio/market-data.service';
 import { DateBasedExchangeRate } from '@ghostfolio/api/services/interfaces/date-based-exchange-rate.interface';
+import { MarketDataService } from '@ghostfolio/api/services/market-data.service';
 import { baseCurrency } from '@ghostfolio/common/config';
 import { DATE_FORMAT, getYesterday } from '@ghostfolio/common/helper';
 import { Injectable, Logger } from '@nestjs/common';

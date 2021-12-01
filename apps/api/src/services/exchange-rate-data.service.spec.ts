@@ -1,12 +1,11 @@
 import { DateQuery } from '@ghostfolio/api/app/portfolio/interfaces/date-query.interface';
 import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data.service';
+import { MarketDataService } from '@ghostfolio/api/services/market-data.service';
 import { MarketData } from '@prisma/client';
 import { Big } from 'big.js';
 import { addDays, endOfDay, isBefore } from 'date-fns';
 
-import { MarketDataService } from '../app/portfolio/market-data.service';
-
-jest.mock('../app/portfolio/market-data.service', () => {
+jest.mock('@ghostfolio/api/services/market-data.service', () => {
   return {
     MarketDataService: jest.fn().mockImplementation(() => {
       return {
