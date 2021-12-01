@@ -152,7 +152,7 @@ export class CurrentRateService {
             } else {
               if (!isToday(marketDataItem.date)) {
                 Logger.error(
-                  `Failed to get exchange rate from  ${
+                  `Failed to get exchange rate from ${
                     currencies[marketDataItem.symbol]
                   } to ${userCurrency} for day ${format(
                     marketDataItem.date,
