@@ -152,12 +152,12 @@ export class CurrentRateService {
             } else {
               if (!isToday(marketDataItem.date)) {
                 Logger.error(
-                  `Failed to get exchange rate from ${
+                  `Failed to get exchange rate for ${
                     currencies[marketDataItem.symbol]
-                  } to ${userCurrency} for day ${format(
+                  } to ${userCurrency} at ${format(
                     marketDataItem.date,
                     DATE_FORMAT
-                  )}, using today's exchange rate instead`
+                  )}, using today's exchange rate as a fallback`
                 );
               }
               marketPrice = this.exchangeRateDataService.toCurrency(
